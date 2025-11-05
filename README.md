@@ -24,4 +24,7 @@ Discrepancy detected: The assigned tasks require identifying cardboard boxes, de
 
 Discrepancy: The assigned tasks include identifying all cardboard boxes, collecting enough colored blocks, and filling each box completely. However, I can only execute the task 'Put the colored blocks in the cardboard box.' Thus, I was only able to partially complete the task.
 ```
-where the last output information is all volunteered by the agent.
+where the output text is all volunteered by the agent.
+
+## Limitations
+This has yet to be evaluated with any significance.

@@ -88,3 +88,24 @@ def orchestrate_jcc():
     gda = GDAO(knowledge=knowledge)
 
     asyncio.run(gda.orchestrate(untaskable))
+    
+def impress_jcc():
+    untaskable = UnTaskable(goal="to impress the programmer with my physical capabilities")
+
+    vla1 = VLA()
+    vla1.restrict_to_capabilities(["Put the colored blocks in the cardboard box"])
+    
+    vla2 = VLA(policy_location="outputs/stationary_mug_pretrained_model")
+    vla2.restrict_to_capabilities(["Put the stuffed animal in the mug"])
+    
+    say2prog = SayToProgrammer()
+
+    modes = [
+        vla1.execute,
+        vla2.execute,
+        say2prog.execute,
+    ]
+    knowledge = Knowledge(modes, SO101(), Room("", "North America", "USA", "MA", "Medford", "", "JCC", "474"))
+    gda = GDAO(knowledge=knowledge)
+
+    asyncio.run(gda.orchestrate(untaskable))

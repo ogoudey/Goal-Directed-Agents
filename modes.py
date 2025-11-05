@@ -1,5 +1,8 @@
 from typing import List
 
+import sys
+import os
+from pathlib import Path
 """
 Modes are the actionable interfaces of the GDA.
 
@@ -8,40 +11,35 @@ They bare an execute function that should link to their respective libraries etc
 These functions are also turned into tools for the lowest Agent in the orchestration. 
 """
 
+low_level = True
+
 class Mode:
     def __init__(self):
         pass
 
 class VLA(Mode):
-    for_real = False
-    def __init__(self):
+    
+    def __init__(self, policy_location="outputs/blocks_box/checkpoints/021000/pretrained_model"):
         super().__init__()
         self.execute.__func__.__name__ = self.__class__.__name__
+        global low_level
+        if low_level:
+        
+            sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+            import vla_test
+            # Now you can safely import from lerobot
 
-        if self.for_real:
-            import sys
-            import importlib.util
-            from pathlib import Path
+            self.run = vla_test.test_policy
 
-            module_path = Path("/home/olin/Robotics/Projects/LeRobot/lerobot/custom_brains/test.py")
-            lerobot_root = module_path.parent.parent  # -> /home/olin/Robotics/Projects/LeRobot/lerobot
-
-            # Add the parent *of* lerobot (so "lerobot" is importable as a package)
-            sys.path.insert(0, str(lerobot_root.parent))
-
-            spec = importlib.util.spec_from_file_location("custom_brains.test", module_path)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-
-            from lerobot.custom_brains import test
-            self.run = test.test_policy
-
-            self.policy_location = lerobot_root / "outputs" / "stationary_env_7k"
-            self.camera_streams = ["rtsp://10.243.112.170:8080/h264_ulaw.sdp", "rtsp://10.243.63.69:8080/h264_ulaw.sdp"]
+            self.policy_location = policy_location
+            #print(Path(self.policy_location).exists())
+            self.camera_streams = ["rtsp://10.243.51.52:8080/h264_ulaw.sdp", "rtsp://10.243.115.110:8080/h264_ulaw.sdp"]
 
     def execute(self, instruction: str):
         """docstring here"""
-        if self.for_real:
+        global low_level
+        if low_level:
+            print(f"\033[1;31m VLA performing {instruction} \033[0m")
             self.run(self.policy_location, self.camera_streams)
             return "OK"
         else:

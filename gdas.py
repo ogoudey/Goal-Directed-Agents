@@ -30,7 +30,7 @@ class UnTask2Goal(GDA):
         tools = [agent.as_tool(tool_name="goal2tasker", tool_description="Turns the goal into tasks. Give your goal to this agent.") for agent in child_agents]
         super().__init__(
             name="untask2goaler",
-            instructions=f"{knowledge.distill(3)}, translate the goal into an actionable goal. Do not include the steps to reach that goal. You are an LLM in a network of Agents. Assume that some other Agent will find steps to get to the goal.",
+            instructions=f"{knowledge.distill(2)}, translate the goal into an actionable goal. Do not include the steps to reach that goal. You are an LLM in a network of Agents. Assume that some other Agent will find steps to get to the goal.",
             tools=tools
         )
     
@@ -43,7 +43,7 @@ class Goal2Task(GDA):
         tools = [agent.as_tool(tool_name="task2tasker", tool_description="Turns the task into actual actions that the system is capable of doing. Call this agent with your outputs tasks.") for agent in child_agents]
         super().__init__(
             name="goal2tasker",
-            instructions=f"{knowledge.distill(3)}, translate the goal into one or more tasks. Keep them simple, brief, and abstract. In your final response (and not as the argument of your tool calls), give a brief description of the status of the progress towards your assigned goal.",
+            instructions=f"{knowledge.distill(2)}, translate the goal into one or more tasks. Keep them simple, brief, and abstract. In your final response (and not as the argument of your tool calls), give a brief description of the status of the progress towards your assigned goal.",
             tools=tools
         )
 

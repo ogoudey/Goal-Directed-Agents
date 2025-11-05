@@ -5,11 +5,12 @@ This repo contains a scheme for an LLM-based architecture for robotic behavior.
 It turns high-level decision making into a problem of finetuning.
 
 Assumptions are that the robot is given:
-** A ultimate goal/motive
-** A minimal texttual description of a morphology
-** A minimal textual description of an environment
-** A list of "modes" that resemble the robot's capabilities (e.g. path plan, use a policy, say something outloud)
+- A ultimate goal/motive
+- A minimal texttual description of a morphology
+- A minimal textual description of an environment
+- A list of "modes" that resemble the robot's capabilities (e.g. path plan, use a policy, say something outloud)
 
+This:
 ```
 python3 main.py
 ```

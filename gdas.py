@@ -43,7 +43,7 @@ class Goal2Task(GDA):
         tools = [agent.as_tool(tool_name="task2tasker", tool_description="Turns the task into actual actions that the system is capable of doing. Call this agent with your outputs tasks.") for agent in child_agents]
         super().__init__(
             name="goal2tasker",
-            instructions=f"{knowledge.distill(3)}, translate the goal into one or more tasks. Keep them simple, brief, and abstract.",
+            instructions=f"{knowledge.distill(3)}, translate the goal into one or more tasks. Keep them simple, brief, and abstract. In your final response (and not as the argument of your tool calls), give a brief description of the status of the progress towards your assigned goal.",
             tools=tools
         )
 
@@ -56,7 +56,7 @@ class Task2Task(GDA):
         tools = [function_tool(mode) for mode in knowledge.modes]
         super().__init__(
             name="task2tasker",
-            instructions=f"{knowledge.distill(0)}, call your tools to fulfill the tasks the best you can. ONLY use your tools. If there's any discrepency between what you're 'assigned' to do and what you can do, return that. Otherwise return something simple, like 'Success'",
+            instructions=f"{knowledge.distill(0)}, call your tools to fulfill the tasks the best you can. ONLY use your tools. If there's any discrepency between what you're 'assigned' to do and what you can do, return that. Otherwise return something simple, like 'Success' - but don't return 'Success' if you have not sufficiently completed the tasks requested of you. Be clever, but don't lie. Get creative, and don't be a perfectionist.",
             tools=tools
         )
 

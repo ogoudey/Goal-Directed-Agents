@@ -13,30 +13,31 @@ class Mode:
         pass
 
 class VLA(Mode):
-    for_real = True
+    for_real = False
     def __init__(self):
         super().__init__()
         self.execute.__func__.__name__ = self.__class__.__name__
 
-        import sys
-        import importlib.util
-        from pathlib import Path
+        if self.for_real:
+            import sys
+            import importlib.util
+            from pathlib import Path
 
-        module_path = Path("/home/olin/Robotics/Projects/LeRobot/lerobot/custom_brains/test.py")
-        lerobot_root = module_path.parent.parent  # -> /home/olin/Robotics/Projects/LeRobot/lerobot
+            module_path = Path("/home/olin/Robotics/Projects/LeRobot/lerobot/custom_brains/test.py")
+            lerobot_root = module_path.parent.parent  # -> /home/olin/Robotics/Projects/LeRobot/lerobot
 
-        # Add the parent *of* lerobot (so "lerobot" is importable as a package)
-        sys.path.insert(0, str(lerobot_root.parent))
+            # Add the parent *of* lerobot (so "lerobot" is importable as a package)
+            sys.path.insert(0, str(lerobot_root.parent))
 
-        spec = importlib.util.spec_from_file_location("custom_brains.test", module_path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+            spec = importlib.util.spec_from_file_location("custom_brains.test", module_path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
 
-        from lerobot.custom_brains import test
-        self.run = test.test_policy
+            from lerobot.custom_brains import test
+            self.run = test.test_policy
 
-        self.policy_location = lerobot_root / "outputs" / "stationary_env_7k"
-        self.camera_streams = ["rtsp://10.243.112.170:8080/h264_ulaw.sdp", "rtsp://10.243.63.69:8080/h264_ulaw.sdp"]
+            self.policy_location = lerobot_root / "outputs" / "stationary_env_7k"
+            self.camera_streams = ["rtsp://10.243.112.170:8080/h264_ulaw.sdp", "rtsp://10.243.63.69:8080/h264_ulaw.sdp"]
 
     def execute(self, instruction: str):
         """docstring here"""

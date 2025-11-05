@@ -13,13 +13,13 @@ class GDAO:
         self.knowledge = knowledge
 
     async def orchestrate(self, untaskable: "UnTaskable"):
-        print(f"Untaskable: {untaskable}")
         task2tasker = Task2Task(self.knowledge)
         goal2tasker = Goal2Task(self.knowledge, [task2tasker])
         untask2goaler = UnTask2Goal(self.knowledge, [goal2tasker])
-        done = await untask2goaler.forward(f"{untaskable}")
-        print(f"Done message: {done}")
 
+        print(f"Ultimate goal: {untaskable}")
+        done = await untask2goaler.forward(f"{untaskable}")
+        
 
     async def execute(self, untaskable: "UnTaskable"):
         print(f"Untaskable: {untaskable}")

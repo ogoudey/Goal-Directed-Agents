@@ -8,7 +8,7 @@ Assumptions are that the robot is given:
 - A ultimate goal/motive
 - A minimal texttual description of a morphology
 - A minimal textual description of an environment
-- A list of "modes" that resemble the robot's capabilities (e.g. path plan, use a policy, say something outloud)
+- A list of "modes" that are the robot's capabilities (e.g. path plan, use a policy, say something outloud)
 
 This:
 ```

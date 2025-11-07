@@ -43,5 +43,4 @@ class Room(Environment):
         self.room_i = Path(room_i)
 
     def __repr__(self):
-        return f"{str(self.universe / self.continent / self.nation /
-                self.state / self.city / self.street / self.address_i / self.room_i)}"
+        return f"{str(self.universe / self.continent / self.nation / self.state / self.city / self.street / self.address_i / self.room_i)}"

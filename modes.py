@@ -52,7 +52,7 @@ class VLA(Mode):
         f"""
         Performs the vision-language-action policy given the language instruction input.
 
-        At this point, the VLA has severe limitations. Here is what it can do (only use one of them as an argument):
+        At this point, the VLA has severe limitations. Here are the recommended language prompts (suggested that we use one of them as an argument):
         
         {capabilities}
 

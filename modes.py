@@ -1,8 +1,9 @@
 from typing import List
-
+import types
 import sys
 import os
 from pathlib import Path
+from logger import log
 """
 Modes are the actionable interfaces of the GDA.
 
@@ -11,7 +12,7 @@ They bare an execute function that should link to their respective libraries etc
 These functions are also turned into tools for the lowest Agent in the orchestration. 
 """
 
-low_level = True
+low_level = False
 
 class Mode:
     def __init__(self):
@@ -21,7 +22,7 @@ class VLA(Mode):
     
     def __init__(self, policy_location="outputs/blocks_box/checkpoints/021000/pretrained_model"):
         super().__init__()
-        self.execute.__func__.__name__ = self.__class__.__name__
+        
         global low_level
         if low_level:
         
@@ -35,24 +36,30 @@ class VLA(Mode):
             #print(Path(self.policy_location).exists())
             self.camera_streams = ["rtsp://10.243.51.52:8080/h264_ulaw.sdp", "rtsp://10.243.115.110:8080/h264_ulaw.sdp"]
 
-    def execute(self, instruction: str):
-        """docstring here"""
-        global low_level
-        if low_level:
-            print(f"\033[1;31m VLA performing {instruction} \033[0m")
-            self.run(self.policy_location, self.camera_streams)
-            return "OK"
-        else:
-            print(f"\033[1;31m🔥 VLA performing {instruction} 🔥\033[0m")
-            return f"Successfully executed {instruction} by the VLA."
+        def execute(self, instruction: str):
+            """Default VLA execution behavior."""
+            global low_level
+            if low_level:
+                print(f"\033[1;31m VLA performing {instruction} \033[0m")
+                log(f"\033[1;31m VLA performing {instruction} \033[0m", "VLA")
+                self.run(self.policy_location, self.camera_streams)
+                return "OK"
+            else:
+                print(f"\033[1;31m🔥 VLA performing {instruction} 🔥\033[0m")
+                log(f"\033[1;31m VLA performing {instruction} \033[0m", "VLA")
+                return f"Successfully executed {instruction} by the VLA."
+
+        # Bind the method to *this* instance
+        self.execute = types.MethodType(execute, self)
+        self.execute.__func__.__name__ = self.__class__.__name__
+
 
     def restrict_to_capabilities(self, capabilities: List[str]):
-        func = type(self).execute
-        func.__doc__ = \
+        self.execute.__func__.__doc__ = \
         f"""
-        Performs the vision-language-action policy given the language instruction input.
+        Performs the vision-language-action policy given the language instruction input, executing a precise, dynamic, and physical policy demonstrating strength and dexterity, for a period of time.
 
-        At this point, the VLA has severe limitations. Here are the recommended language prompts (suggested that we use one of them as an argument):
+        At this point, however, the VLA has severe limitations. It has only been trained on certain instructions. Here are the recommended language prompts (i.e. the instuctions its been trained on):
         
         {capabilities}
 
@@ -80,5 +87,5 @@ class SayToProgrammer(Mode):
         
         text: A line of pure text to send to the programmer.
         """
-        print(f"{text}")
+        print(f"\nTo programmer:\n**\n{text}\n**")
         return f"Successfully sent {text} to the programmer. (Though we don't know if he/she saw it.)"

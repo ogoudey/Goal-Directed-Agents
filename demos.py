@@ -44,6 +44,8 @@ def boat_in_boston():
 def chimera_in_boston():
     untaskable = UnTaskable(goal="to have any cube that is in Boston Harbor moved to a bowl in Back Bay")
 
+    vla = VLA()
+    vla.restrict_to_capabilities(["Put the cube in the bowl"])
     
     planner = BostonHarbor2BackBay()
     say2prog = SayToProgrammer()
@@ -92,11 +94,13 @@ def orchestrate_jcc():
 def impress_jcc():
     untaskable = UnTaskable(goal="to impress the programmer with my physical capabilities")
 
-    vla1 = VLA()
-    vla1.restrict_to_capabilities(["Put the colored blocks in the cardboard box"])
-    
     vla2 = VLA(policy_location="outputs/stationary_mug_pretrained_model")
     vla2.restrict_to_capabilities(["Put the stuffed animal in the mug"])
+
+    vla1 = VLA(policy_location="outputs/stationary_mug_pretrained_model")
+    vla1.restrict_to_capabilities(["Put the colored blocks in the cardboard box"])
+    
+    
     
     say2prog = SayToProgrammer()
 

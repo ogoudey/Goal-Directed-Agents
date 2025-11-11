@@ -17,7 +17,7 @@ class Knowledge:
 
     def distill(self, level: int=0):
         return {
-            0: f"Given that you are {self.morphology} in {self.environment}",
+            0: f"Given that you are {self.morphology} in the phsycal location of (continent, nation,... building, room #): {self.environment}",
             1: f"Given that you are {self.morphology} in {self.environment}",
             2: f"Given that you are {self.morphology}",
             3: f"",

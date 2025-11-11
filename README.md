@@ -15,7 +15,9 @@ This:
 python3 main.py
 ```
 
-runs a demo:
+runs a chosen demo.
+
+#### Example 1
 ```
 Ultimate goal: to fill all cardboard boxes      # (hard-coded)
 
@@ -26,6 +28,19 @@ Discrepancy detected: The assigned tasks require identifying cardboard boxes, de
 Discrepancy: The assigned tasks include identifying all cardboard boxes, collecting enough colored blocks, and filling each box completely. However, I can only execute the task 'Put the colored blocks in the cardboard box.' Thus, I was only able to partially complete the task.
 ```
 where the output text is all volunteered by the agent.
+
+#### Example 2
+```
+Ultimate goal: to impress the programmer with my physical capabilities
+🔥 VLA performing Put the colored blocks in the cardboard box 🔥
+🔥 VLA performing Put the stuffed animal in the mug 🔥
+
+To programmer:
+**
+Success
+**
+```
+(lol)
 
 ## Limitations
 This has yet to be evaluated with any significance.

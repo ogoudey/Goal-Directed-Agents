@@ -1,4 +1,4 @@
-from demos import orchestrate, chimera_in_boston, orchestrate_jcc, impress_jcc
+from demos import orchestrate, chimera_in_boston, orchestrate_jcc, impress_jcc, cycling_jcc
 
 import modes
 
@@ -11,7 +11,7 @@ modes.low_level = False
 
 def main():    
     #chimera_in_boston()
-    impress_jcc()
+    cycling_jcc()
 
 if __name__ == "__main__":
     main()

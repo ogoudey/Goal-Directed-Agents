@@ -113,3 +113,22 @@ def impress_jcc():
     gda = GDAO(knowledge=knowledge)
 
     asyncio.run(gda.orchestrate(untaskable))
+
+def cycling_jcc():
+    untaskable = UnTaskable(goal="to put all blocks in boxes")
+
+    vla1 = VLA(policy_location="outputs/stationary_mug_pretrained_model")
+    vla1.restrict_to_capabilities(["Put the colored blocks in the cardboard box"]) # affects docstring
+    
+    
+    
+    say2prog = SayToProgrammer()
+
+    modes = [
+        vla1.execute,
+        say2prog.execute,
+    ]
+    knowledge = Knowledge(modes, SO101(), Room("", "North America", "USA", "MA", "Medford", "", "JCC", "474"))
+    gda = GDAO(knowledge=knowledge)
+
+    asyncio.run(gda.loop(untaskable))

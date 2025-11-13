@@ -42,18 +42,19 @@ class VLA(Mode):
             """Default VLA execution behavior."""
             global low_level
             if low_level:
-                print(f"\033[1;31m VLA performing {instruction} \033[0m")
                 log(f"\033[1;31m VLA performing {instruction} \033[0m", "VLA")
                 self.run(self.policy_location, self.camera_streams)
                 return "OK"
             else:
-                print(f"\033[1;31m🔥 VLA performing {instruction} 🔥\033[0m")
-                for i in range(0, 100):
+                log(f"\033[1;31m🔥 VLA performing {instruction} 🔥\033[0m", "VLA")
+                for i in range(0, 10):
                     if random.random() < 0.1:
+                        log("VLA complex exiting early.", "VLA")
                         return "Exiting early."
-                    print("VLA complex is waiting 1 second.")
+                    
+                    log("VLA complex is waiting 1 second.", "VLA")
                     time.sleep(1)
-                log(f"\033[1;31m VLA performing {instruction} \033[0m", "VLA")
+                log(f"\033[1;31m VLA done performing {instruction} (success!)\033[0m", "VLA")
                 return f"Successfully executed {instruction} by the VLA."
 
         # Bind the method to *this* instance
@@ -95,7 +96,7 @@ class SayToProgrammer(Mode):
         text: A line of pure text to send to the programmer.
         """
         print(f"\nTo programmer:\n**\n{text}\n**")
-        return f"Successfully sent {text} to the programmer. (Though we don't know if he/she saw it.)"
+        return f"Successfully sent \"{text}\" to the programmer. (Though we don't know if he/she saw it.)"
 
 
 

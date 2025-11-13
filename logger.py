@@ -6,8 +6,8 @@ if os.path.exists("logs"):
         if filename.endswith(".log"):
             file_path = os.path.join("logs", filename)
             with open(file_path, "a", encoding="utf-8") as f:
-                f.write("\n" * 10)
-            print(f"Appended {10} blank lines to {filename}")
+                f.write("\n" * 20)
+            #print(f"Appended {10} blank lines to {filename}")
 
 def log(message: str, log_name: str):
     # Ensure logs directory exists

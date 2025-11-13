@@ -96,3 +96,9 @@ class SayToProgrammer(Mode):
         """
         print(f"\nTo programmer:\n**\n{text}\n**")
         return f"Successfully sent {text} to the programmer. (Though we don't know if he/she saw it.)"
+
+
+
+### VLM TESTING GROUNDS ###
+
+

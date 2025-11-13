@@ -8,7 +8,7 @@ from knowledge import Knowledge
 
 from logger import log
 
-
+import time
 
 """
 These agents compute according to their set up within a Goal-Directed Agent
@@ -19,6 +19,7 @@ class GDA(Agent):
     parent: "GDA"
     options: List
 
+    prior_prompt: str
     prompt: str
     last_output: str | None
 
@@ -35,35 +36,51 @@ class GDA(Agent):
 
         self.options = [] # a list of functions that can be used by parent agent
 
-        self.cycle_period = 10
+        self.cycle_period = 60 # 1bpm
 
         self.on = False
+        self.prior_prompt = ""
         self.last_output = None
         self.running_threads = []
         
 
-    async def run_thread(self):
-        log(f"Async task started for {self.name}.", f"ASYNC_{self.name}")
+    def run_thread(self):
+        log(f"Async task started for {self.name}.", f"THREAD_{self.name}")
+        thread_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(thread_loop)
+
         while self.on:
+            if self.prompt == self.prior_prompt:
+                # unless timer?
+                continue
             for agent in self.child_agents:
-                log(f"Extending {self.name}'s tools with options of {agent}.", f"ASYNC_{self.name}")
                 child_options = [function_tool(option) for option in agent.options]
-                log(f"These options are: {child_options}.", f"ASYNC_{self.name}")
+                if len(child_options) == len(self.tools): 
+                    # assuming there's no change in tools given child options are the same length of current tools
+                    break
+                log(f"Extending {self.name}'s tools with options of {agent.name}.", f"THREAD_{self.name}")
+                log(f"These options are: {child_options}.", f"THREAD_{self.name}")
+                self.tools = []
                 self.tools.extend(child_options)
                 agent.parent = self
-
-            log(f"{self.name}'s thread self-prompting with {self.prompt}.", f"ASYNC_{self.name}")
             self.show_disposition(self.prompt)
-            result = await Runner.run(self, self.prompt)
+            log(f"{self.name}'s thread self-prompting with {self.prompt}.", f"THREAD_{self.name}")
+            
+            result = Runner.run_sync(self, self.prompt)
+            self.prior_prompt = self.prompt
+            #time.sleep(5)
+            log(f"{self.name}'s thread setting last_output to {self.last_output}.", f"THREAD_{self.name}")
+            
             self.last_output = result.final_output
-            log(f"{self.name}'s thread setting last_output to {self.last_output}.", f"ASYNC_{self.name}")
             self.show_response(self.prompt, result.final_output)
 
     async def run(self):
-        run = asyncio.create_task(self.run_thread())
+        #run = asyncio.create_task(self.run_thread())
+        run = threading.Thread(target=self.run_thread)
         self.running_threads.append(run)
+        run.start()
         log(f"{self.name} is now running {len(self.running_threads)} async tasks.", f"DEBUG_{self.name}")
-        await asyncio.sleep(0)
+        #await asyncio.sleep(0)
         return f"{self.name} is now running."
 
 
@@ -75,7 +92,7 @@ class GDA(Agent):
 {self.instructions}
 
 
-{[tool.name for tool in self.tools]}
+{[child.name for child in self.child_agents]}:{[tool.name for tool in self.tools]}
                                 ...   
         """, self.name)
         
@@ -86,7 +103,7 @@ class GDA(Agent):
 {self.instructions}
 
 
-{[tool.name for tool in self.tools]}
+{[child.name for child in self.child_agents]}:{[tool.name for tool in self.tools]}
 --------------------------------------------------------------------------
 
 {response}
@@ -148,6 +165,7 @@ class Goal2Task(GDA):
             child_agents=child_agents,
         )
         self.options.append(self.loop)
+        self.cycle_period = 30
         
     
     async def loop(self, prompt: str) -> str:
@@ -182,6 +200,7 @@ class Task2Task(GDA):
         )
 
         self.options.append(self.loop)
+        self.cycle_period = 5
 
     async def loop(self, prompt: str) -> str:
         """Turns the goal into tasks. Give your goal to this agent. Only call this once."""
@@ -203,18 +222,32 @@ class Task2Task(GDA):
         self.on = False
         return f"{self.name} is stopped. Most recent output: {self.last_output}"
 
-    async def run_thread(self):
-        # overrides
-        while self.on:
-            tools = [function_tool(mode) for mode in self.knowledge.modes]
-            log(f"Extending {self.name}'s tools with {tools}.", f"DEBUG_{self.name}")
-            self.tools.extend(tools)
+    def run_thread(self):
+        log(f"Async task started for {self.name}.", f"THREAD_{self.name}")
+        thread_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(thread_loop)
 
-            log(f"{self.name}'s thread self-prompting with {self.prompt}.", f"DEBUG_{self.name}")
+        while self.on:
+            if self.prompt == self.prior_prompt:
+                # unless timer?
+                continue
+            for agent in self.child_agents:
+                log(f"Modes: {len(self.knowledge.modes)}. Tools: {self.tools}.", f"THREAD_{self.name}")
+                if len(self.knowledge.modes) == len(self.tools): 
+                    # assuming there's no change in tools given child options are the same length of current tools
+                    break
+                self.tools = [function_tool(mode) for mode in self.knowledge.modes]
+                log(f"Updating {self.name}'s tools to {self.tools}.", f"THREAD_{self.name}")
+                agent.parent = self
             self.show_disposition(self.prompt)
-            result = await Runner.run(self, self.prompt)
+            log(f"{self.name}'s thread self-prompting with {self.prompt}.", f"THREAD_{self.name}")
+            
+            result = Runner.run_sync(self, self.prompt)
+            self.prior_prompt = self.prompt
+            #time.sleep(5)
+            log(f"{self.name}'s thread setting last_output to {self.last_output}.", f"THREAD_{self.name}")
+            
             self.last_output = result.final_output
-            log(f"{self.name}'s thread setting last_output to {self.last_output}.", f"DEBUG_{self.name}")
             self.show_response(self.prompt, result.final_output)
     
     async def forward(self, prompt: str) -> str:

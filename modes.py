@@ -1,5 +1,7 @@
 from typing import List
+import random
 import types
+import time
 import sys
 import os
 from pathlib import Path
@@ -46,6 +48,11 @@ class VLA(Mode):
                 return "OK"
             else:
                 print(f"\033[1;31m🔥 VLA performing {instruction} 🔥\033[0m")
+                for i in range(0, 100):
+                    if random.random() < 0.1:
+                        return "Exiting early."
+                    print("VLA complex is waiting 1 second.")
+                    time.sleep(1)
                 log(f"\033[1;31m VLA performing {instruction} \033[0m", "VLA")
                 return f"Successfully executed {instruction} by the VLA."
 

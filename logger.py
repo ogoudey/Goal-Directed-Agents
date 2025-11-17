@@ -6,7 +6,7 @@ if os.path.exists("logs"):
         if filename.endswith(".log"):
             file_path = os.path.join("logs", filename)
             with open(file_path, "a", encoding="utf-8") as f:
-                f.write("\n" * 20)
+                f.write("\n" * 100)
             #print(f"Appended {10} blank lines to {filename}")
 
 def log(message: str, log_name: str):

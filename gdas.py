@@ -65,20 +65,32 @@ class GDA(Agent):
                 self.tools = []
                 self.tools.extend(child_options)
                 agent.parent = self
+            log(f"{self.name} is on and its thread is self-prompting.", f"DEBUG_{self.name}")
             self.show_disposition(self.input)
             log(f"{self.name}'s thread self-prompting with {self.input}.", f"THREAD_{self.name}")
             self.instructions = self.distill_knowledge()
+            log(f"{self.name}'s knowledge changed before prompting...", f"THREAD_{self.name}")
+            self.knowledge.is_fresh = False
             result = Runner.run_sync(self, input=self.input)
+            
             self.prior_input = self.input
             
             log(f"{self.name}'s thread setting last_output to {self.last_output}.", f"THREAD_{self.name}")
             self.last_output = result.final_output
             self.show_response(self.input, result.final_output)
             if hasattr(self, 'parent'):
-                update = self.parent.knowledge.update(self.prior_input, self.last_output)
+                update = self.parent.update_knowledge(self.prior_input, self.last_output)
                 log(f"{self.name}'s thread has updated {self.parent.name}'s knowledge with {update}.", f"THREAD_{self.name}")
-                log(f"{self.parent.name} has received an update to its knowledge: {update}.", f"THREAD_{self.parent.name}")
             time.sleep(self.cycle_period)
+
+    def update_knowledge(self, child_prior_input, child_last_output):
+        update = self.knowledge.update(child_prior_input, child_last_output)
+        log(f"{self.name} has received an update to its knowledge: {update}.", f"THREAD_{self.name}")
+        self.last_output = "Running"
+        if hasattr(self, 'parent'):
+            self.parent.update_knowledge(self.prior_input, self.last_output)
+        return update
+
 
     async def run(self):
         #run = asyncio.create_task(self.run_thread())
@@ -216,7 +228,7 @@ class Task2Task(GDA):
         self.cycle_period = 5
 
     async def loop(self, prompt: str) -> str:
-        """Turns the goal into tasks. Give your goal to this agent. Only call this once."""
+        """Turns the task into exectable tasks (i.e. Agent tool calls). Give your task to this agent. If available, use prior feedback to engineer your prompt/task."""
         log(f"{self.name} was just poked with prompt {prompt}", f"DEBUG_{self.name}")
         self.input = prompt
         if self.on:
@@ -241,41 +253,33 @@ class Task2Task(GDA):
             In your final response, (not the arguments to the tools, obviously), provide information about the effects of your actions."
 
     def run_thread(self):
-        log(f"Async task started for {self.name}.", f"THREAD_{self.name}")
+        log(f"Thread started for {self.name}.", f"THREAD_{self.name}")
         thread_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(thread_loop)
 
         while self.on:
+            log(f"Input: {self.input} vs. {self.prior_input}.", f"THREAD_{self.name}")
             if self.input == self.prior_input:
                 # unless timer?
+                log(f"No change of input. {self.name} is passing computation.", f"THREAD_{self.name}")
                 time.sleep(self.cycle_period)
                 continue
-        
-            log(f"Modes: {len(self.knowledge.modes)}. Tools: {self.tools}.", f"THREAD_{self.name}")
-            if len(self.knowledge.modes) == len(self.tools): 
-                # assuming there's no change in tools given child options are the same length of current tools
-                break
+                
+            #log(f"Modes: {len(self.knowledge.modes)}. Tools: {self.tools}.", f"THREAD_{self.name}")
             self.tools = [function_tool(mode) for mode in self.knowledge.modes]
-            log(f"Updating {self.name}'s tools to {self.tools}.", f"THREAD_{self.name}")
+            #log(f"Updating {self.name}'s tools to {self.tools}.", f"THREAD_{self.name}")
             self.show_disposition(self.input)
             log(f"{self.name}'s thread self-prompting with {self.input}.", f"THREAD_{self.name}")
             
             result = Runner.run_sync(self, self.input)
             self.prior_input = self.input
-            
+            self.last_output = result.final_output
             log(f"{self.name}'s thread setting last_output to {self.last_output}.", f"THREAD_{self.name}")
             
-            self.last_output = result.final_output
+            
             self.show_response(self.input, result.final_output)
             if hasattr(self, 'parent'):
-                update = self.parent.knowledge.update(self.prior_input, self.last_output)
+                update = self.parent.update_knowledge(self.prior_input, self.last_output)
+
                 log(f"{self.name}'s thread has updated {self.parent.name}'s knowledge with {update}.", f"THREAD_{self.name}")
-                log(f"{self.parent.name} has received an update to its knowledge: {update}.", f"THREAD_{self.parent.name}")
             time.sleep(self.cycle_period)
-    
-    async def forward(self, prompt: str) -> str:
-        """Turns the task into actual actions that the system is capable of doing. Call this agent with your outputs tasks."""
-        log(f"{self.name}({prompt})", self.parent.name)
-        result = await self.run(prompt)
-        log(f"{self.name}({prompt}) => {result.final_output}", self.parent.name)
-        return result.final_output

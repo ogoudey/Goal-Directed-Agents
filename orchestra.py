@@ -6,6 +6,9 @@ from gdas import Task2Task, Goal2Task, UnTask2Goal
 from time import sleep
 
 from logger import log
+
+import copy
+
 class GDAO:
     """
     Initializes the architecture of the orchestration
@@ -23,9 +26,9 @@ class GDAO:
         done = await untask2goaler.forward(f"{untaskable}")
         
     async def loop(self, untaskable: UnTaskable):
-        task2tasker = Task2Task(self.knowledge)
-        goal2tasker = Goal2Task(self.knowledge, [task2tasker])
-        untask2goaler = UnTask2Goal(self.knowledge, [goal2tasker])
+        task2tasker = Task2Task(copy.deepcopy(self.knowledge))
+        goal2tasker = Goal2Task(copy.deepcopy(self.knowledge), [task2tasker])
+        untask2goaler = UnTask2Goal(copy.deepcopy(self.knowledge), [goal2tasker])
 
         while True:
             print(f"Poking untasker with {untaskable}")

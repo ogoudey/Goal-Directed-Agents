@@ -15,7 +15,7 @@ class Knowledge:
         self.morphology = morph
         self.environment = env
 
-        self.updates_from_child = ""
+        self.updates_from_child = "No prior calls."
         self.is_fresh = False
 
     def distill(self, level: int=0):
